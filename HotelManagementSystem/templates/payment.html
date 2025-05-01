@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/payment.css') }}">
+</head>
+
+<body>
+    <header>
+        <h1>Payment Information</h1>
+    </header>
+
+    <div class="container">
+        <div class="payment-form">
+            <h2>Enter Payment Details</h2>
+            <form id="paymentForm" novalidate>
+                <label for="cardName">Name on Card:</label>
+                <input type="text" id="cardName" name="cardName" placeholder="John Doe" required
+                    pattern="^[a-zA-Z\s]+$" title="Name must contain only letters and spaces">
+
+                <label for="cardNumber">Card Number:</label>
+                <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9101 1121" 
+                    maxlength="16" required pattern="\d{16}" 
+                    title="Card number must be 16 digits">
+
+                <label for="expiryDate">Expiry Date:</label>
+                <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/YY" maxlength="5" required 
+                    pattern="^(0[1-9]|1[0-2])\/\d{2}$" title="Enter a valid expiry date in MM/YY format">
+
+                <label for="cvv">CVV:</label>
+                <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="3" required 
+                    pattern="\d{3}" title="CVV must be 3 digits">
+
+                <div class="btn-group">
+                    <button type="submit" class="btn">Pay Now</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced payment.js validation
+        document.getElementById('paymentForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const cardName = document.getElementById('cardName').value.trim();
+            const cardNumber = document.getElementById('cardNumber').value.trim();
+            const expiryDate = document.getElementById('expiryDate').value.trim();
+            const cvv = document.getElementById('cvv').value.trim();
+            
+
+
+            if (!cardName||!cardNumber||!expiryDate||!cvv) {
+                alert("all fields are requred");
+                return;
+            }
+            // Validate card number (16 digits)
+            const cardNumberRegex = /^\d{16}$/;
+            if (!cardNumberRegex.test(cardNumber)) {
+                alert("Card number must be exactly 16 digits.");
+                return;
+            }
+
+            // Validate expiry date (MM/YY)
+            const expiryDateRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+            if (!expiryDateRegex.test(expiryDate)) {
+                alert("Enter a valid expiry date in MM/YY format.");
+                return;
+            }
+
+            // Validate CVV (3 digits)
+            const cvvRegex = /^\d{3}$/;
+            if (!cvvRegex.test(cvv)) {
+                alert("CVV must be exactly 3 digits.");
+                return;
+            }
+
+            // If all validations pass
+            alert("Payment Successful!");
+            window.location.href = 'success.html';  // Redirect to a success page or confirmation
+        });
+    </script>
+</body>
+
+</html>

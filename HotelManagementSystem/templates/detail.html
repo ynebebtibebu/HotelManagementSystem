@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail.css') }}">
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='image/logo.jpg') }}" alt="logo" class="logo">
+        <h1>Hotel Room Details</h1>
+    </header>
+
+    <div class="container">
+        <!-- Form Container -->
+        <div class="form-container">
+            <h2>New Room Add</h2>
+            <form id="roomForm">
+                <label for="floor">Floor:</label>
+                <input type="text" id="floor" name="floor" required>
+
+                <label for="roomNo">Room Number:</label>
+                <input type="text" id="roomNo" name="roomNo" required>
+
+                <label for="roomType">Room Type:</label>
+                <input type="text" id="roomType" name="roomType" required>
+
+                <div class="btn-group">
+                    <button type="button" class="btn" onclick="addRoom()">Add</button>
+                    <button type="button" class="btn" onclick="updateRoom()">Update</button>
+                    <button type="button" class="btn" onclick="deleteRoom()">Delete</button>
+                    <button type="button" class="btn" onclick="resetForm()">Reset</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <h2>Room Details</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Floor</th>
+                        <th>Room Number</th>
+                        <th>Room Type</th>
+                    </tr>
+                </thead>
+                <tbody id="roomTable">
+                    <!-- Dynamic rows will go here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let details = [];
+let selectedRow = null;
+
+// Add Room
+function addRoom() {
+    const floor = document.getElementById('floor').value;
+    const roomNo = document.getElementById('roomNo').value;
+    const roomType = document.getElementById('roomType').value;
+
+    if (!floor || !roomNo || !roomType) {
+        alert('Please fill all fields');
+        return;
+    }
+
+    const room = { floor, roomNo, roomType };
+
+    fetch('/detail', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(room),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.message === 'Room added successfully') {
+                alert('Room added successfully');
+                renderTable(); // Re-render the table after adding
+                resetForm(); // Reset form
+            } else {
+                alert('Error adding room: ' + data.message);
+            }
+        })
+        .catch((error) => alert('Error: ' + error));
+}
+
+// Update Room
+function updateRoom() {
+    if (!selectedRow) {
+        alert('Select a room to update');
+        return;
+    }
+
+    const index = selectedRow.dataset.index;
+    const updatedRoom = {
+        floor: document.getElementById('floor').value,
+        roomNo: document.getElementById('roomNo').value,
+        roomType: document.getElementById('roomType').value,
+    };
+
+    fetch('/detail', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedRoom),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            alert(data.message);
+            renderTable(); // Re-render the table after update
+            resetForm(); // Reset form
+        })
+        .catch((error) => alert('Error: ' + error));
+}
+
+// Delete Room
+function deleteRoom() {
+    if (!selectedRow) {
+        alert('Select a room to delete');
+        return;
+    }
+
+    const index = selectedRow.dataset.index;
+    const room = details[index];
+
+    fetch(`/detail?roomNo=${room.roomNo}`, {
+        method: 'DELETE',
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            alert(data.message);
+            renderTable(); // Re-render the table after deletion
+            resetForm(); // Reset form
+        })
+        .catch((error) => alert('Error: ' + error));
+}
+
+
+// Render Table
+function renderTable() {
+    const tbody = document.getElementById('roomTable');
+    tbody.innerHTML = '';
+
+    fetch('/detail')
+        .then((response) => response.json())
+        .then((data) => {
+            details = data; // Update the details array with fetched data
+            data.forEach((room, index) => {
+                const row = document.createElement('tr');
+                row.dataset.index = index;
+                row.innerHTML = `
+                    <td>${room.floor}</td>
+                    <td>${room.roomNo}</td>
+                    <td>${room.roomType}</td>
+                `;
+                row.onclick = () => {
+                    if (selectedRow) selectedRow.classList.remove('selected');
+                    selectedRow = row;
+                    selectedRow.classList.add('selected');
+                    document.getElementById('floor').value = room.floor;
+                    document.getElementById('roomNo').value = room.roomNo;
+                    document.getElementById('roomType').value = room.roomType;
+                };
+                tbody.appendChild(row);
+            });
+        })
+        .catch((error) => alert('Error fetching rooms: ' + error));
+}
+
+// Reset Form
+function resetForm() {
+    document.getElementById('floor').value = '';
+    document.getElementById('roomNo').value = '';
+    document.getElementById('roomType').value = '';
+    if (selectedRow) selectedRow.classList.remove('selected');
+    selectedRow = null;
+}
+
+// Initially render the table
+renderTable();
+
+
+    </script>
+    
+</body>
+</html>

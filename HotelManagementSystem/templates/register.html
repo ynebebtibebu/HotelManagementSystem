@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='image/logo.jpg') }}" alt="logo">
+        </div>
+        <h1>Customer Management</h1>
+    </header>
+
+    <div class="container">
+        <!-- Form Container -->
+        <div class="form-container">
+            <h2>Customer Details</h2>
+            <form id="customerForm" novalidate>
+
+                
+
+                <label for="customerName">Customer Name:</label>
+                <input type="text" id="customerName" name="customerName" placeholder="Enter customer name" required
+                    pattern="^[a-zA-Z\s]+$" title="Customer name must only contain letters and spaces">
+
+                <label for="phone">Phone Number:</label>
+                <input type="text" id="phone" name="phone" placeholder="Enter phone number" required
+                    pattern="^\d{10}$" title="Phone number must be exactly 10 digits">
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Enter email address" required>
+
+                <label for="address">Address:</label>
+                <input type="text" id="address" name="address" placeholder="Enter address" required>
+
+                <label for="id">ID Number:</label>
+                <input type="text" id="id" name="id" placeholder="Enter ID number" required
+                    pattern="^\d+$" title="ID number must only contain digits">
+
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender" required>
+                    <option value="">Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+
+                <label for="nationality">Nationality:</label>
+                <select id="nationality" name="nationality" required>
+                    <option value="">Select</option>
+                    <option value="USA">USA</option>
+                    <option value="India">India</option>
+                    <option value="UK">UK</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Australia">Australia</option>
+                </select>
+
+                <div class="btn-group">
+                    <button type="button" class="btn" onclick="addCustomer()">Add</button>
+                    <button type="button" class="btn" onclick="updateCustomer()">Update</button>
+                    <button type="button" class="btn" onclick="deleteCustomer()">Delete</button>
+                    <button type="button" class="btn" onclick="resetForm()">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Reset the form
+        function resetForm() {
+            document.getElementById('customerForm').reset();
+        }
+
+        function addCustomer() {
+    const customerName = document.getElementById('customerName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const id = document.getElementById('id').value.trim();
+    const gender = document.getElementById('gender').value.trim();
+    const nationality = document.getElementById('nationality').value.trim();
+
+    // Validate form fields
+    if (!customerName || !phone || !email || !address || !id || !gender || !nationality) {
+        alert("All fields are required.");
+        return;
+    }
+
+    // Validate phone number (10 digits)
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+        alert("Phone number must be exactly 10 digits.");
+        return;
+    }
+
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert("Please enter a valid email address.");
+        return;
+    }
+
+    // Validate ID (only digits)
+    const idRegex = /^\d+$/;
+    if (!idRegex.test(id)) {
+        alert("ID number must only contain digits.");
+        return;
+    }
+
+    // Prepare customer data
+    const customer = {
+        customerName: customerName,
+        phone: phone,
+        email: email,
+        address: address,
+        id: id,
+        gender: gender,
+        nationality: nationality
+    };
+
+    // Submit customer data via fetch API
+    fetch('/customers', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(customer),
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to add customer');
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert('Customer added successfully');
+            window.location.href = 'payment.html';  // Redirect to payment.html
+        })
+        .catch(error => {
+            console.error('Error adding customer:', error);
+            alert('Error adding customer: ' + error.message);
+        });
+}
+        function updateCustomer() {
+            if (!selectedRow) {
+                alert('Select a customer to update.');
+                return;
+            }
+
+            const customer = {
+                customerRef: document.getElementById('customerRef').value,
+                customerName: document.getElementById('customerName').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value,
+                id: document.getElementById('id').value,
+                gender: document.getElementById('gender').value,
+                nationality: document.getElementById('nationality').value
+            };
+
+            fetch('http://127.0.0.1:5000/customers', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(customer)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                showAllCustomers();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function deleteCustomer() {
+            if (!selectedRow) {
+                alert('Select a customer to delete.');
+                return;
+            }
+
+
+
+            const customerRef = document.getElementById('customerRef').value;
+
+            fetch(`http://127.0.0.1:5000/customers?customerRef=${customerRef}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                showAllCustomers();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function resetForm() {
+            document.getElementById('customerForm').reset();
+            document.getElementById('customerRef').value = '';
+            selectedRow = null;
+        }
+
+    </script>
+</body>
+
+</html>

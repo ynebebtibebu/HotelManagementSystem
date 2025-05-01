@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Room Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/room.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='image/logo.jpg') }}" alt="logo" width="100" height="60">
+        </div>
+        <h1>Room Booking Detail</h1>
+    </header>
+
+    <div class="container">
+        <!-- Left Side: Form -->
+        <div class="form-container">
+            <form id="bookingForm">
+                <label for="contact">Customer Contact:</label>
+                <input type="text" id="contact" name="contact" placeholder="Enter Contact" required>
+               
+                <label for="checkin">Check-in Date:</label>
+                <input type="date" id="checkin" name="checkin" required>
+
+                <label for="checkout">Check-out Date:</label>
+                <input type="date" id="checkout" name="checkout" required>
+
+                <label for="roomType">Room Type:</label>
+                <select id="roomType" name="roomType" required>
+                    <option value="">Select Room Type</option>
+                    {% for room_type in roomTypes %}
+                        <option value="{{ room_type }}">{{ room_type }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- Available Room Selection -->
+                <label for="availableRoom">Available Room:</label>
+                <select id="availableRoom" name="availableRoom" required>
+                    <option value="">Select Available Room</option>
+                </select>
+
+                <label for="meal">Meal:</label>
+                <select id="meal" name="meal" required>
+                    <option value="">Select Meal</option>
+                    <option value="breakfast">Breakfast</option>
+                    <option value="lunch">Lunch</option>
+                    <option value="dinner">Dinner</option>
+                    <option value="no">No Meal</option>
+                </select>
+
+
+                <label for="noOfDays">No. of Days:</label>
+                <input type="number" id="noOfDays" name="noOfDays" min="1" required>
+
+                <label for="paidTax">Paid Tax:</label>
+                <input type="number" id="paidTax" name="paidTax" required>
+
+                <label for="subTotal">Sub Total:</label>
+                <input type="number" id="subTotal" name="subTotal" required>
+
+                <label for="totalCost">Total Cost:</label>
+                <input type="number" id="totalCost" name="totalCost" required>
+
+                <div class="btn-group">
+                    <button type="button" class="btn" onclick="addCustomer()">Add</button>
+                    <button type="button" class="btn" onclick="updateBooking()">Update</button>
+                    <button type="button" class="btn" onclick="deleteBooking()">Delete</button>
+                    <button type="button" class="btn" onclick="resetForm()">Reset</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Side: Room Image -->
+        <div class="image-container">
+            <img src="{{ url_for('static', filename='image/room.jpg') }}" alt="room image" id="roomImage">
+            <div id="overlayData" class="overlay"></div>
+        </div>
+        
+        
+    </div>
+    
+
+    <!-- Table Section for Displaying Customer Data -->
+    <div class="table-container">
+        <h2>Customer Booking Details</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Contact</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Room Type</th>
+                    <th>Available Room</th>
+                    <th>Meal</th>
+                    <th>No. of Days</th>
+                    <th>Paid Tax</th>
+                    <th>Sub Total</th>
+                    <th>Total Cost</th>
+                </tr>
+            </thead>
+            <tbody id="customerTableBody">
+                <!-- Data will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let customerData = []; // To store customer data
+        let selectedRow = null; // Track the selected row for updates/deletes
+        let bookedRooms = []; // To track booked rooms
+        
+        // Fetch room types and populate the dropdown
+        window.onload = function () {
+            fetchRoomTypes();
+            fetchBookings();
+        };
+        
+        // Fetch room types
+        function fetchRoomTypes() {
+            fetch('/rooms')
+                .then((response) => response.json())
+                .then((data) => {
+                    const roomTypeSelect = document.getElementById('roomType');
+                    data.roomTypes.forEach((roomType) => {
+                        const option = document.createElement('option');
+                        option.value = roomType;
+                        option.textContent = roomType;
+                        roomTypeSelect.appendChild(option);
+                    });
+                })
+                .catch((error) => console.error('Error fetching room types:', error));
+        }
+        
+        // Update available rooms based on selected room type
+        document.getElementById('roomType').addEventListener('change', function () {
+            const roomType = this.value;
+            const availableRoomSelect = document.getElementById('availableRoom');
+            availableRoomSelect.innerHTML = '<option value="">Select Available Room</option>'; // Reset
+        
+            if (roomType) {
+                fetch(`/rooms/available_rooms?roomType=${roomType}`)
+                    .then((response) => response.json())
+                    .then((rooms) => {
+                        const availableRooms = rooms.filter((room) => !bookedRooms.includes(room.roomNo));
+                        availableRooms.forEach((room) => {
+                            const option = document.createElement('option');
+                            option.value = room.roomNo;
+                            option.textContent = `Room No: ${room.roomNo} - Floor: ${room.floor}`;
+                            availableRoomSelect.appendChild(option);
+                        });
+                    })
+                    .catch((error) => console.error('Error fetching available rooms:', error));
+            }
+        });
+        
+        // Prevent selecting a booked room
+        document.getElementById('availableRoom').addEventListener('change', function () {
+            if (bookedRooms.includes(this.value)) {
+                alert('This room is already booked. Please choose another.');
+                this.value = '';
+            }
+        });
+        
+        // Add a new customer booking
+        function addCustomer() {
+            const formFields = getFormValues();
+            if (!formFields) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+        
+            bookedRooms.push(formFields.availableRoom);
+        
+            fetch('/api/bookings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formFields),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    alert(data.message);
+                    fetchBookings();
+                    resetForm();
+                })
+                .catch((error) => console.error('Error:', error));
+        }
+        
+        // Fetch all bookings
+        function fetchBookings() {
+            fetch('/api/bookings')
+                .then((response) => response.json())
+                .then((data) => {
+                    customerData = data;
+                    renderTable();
+                })
+                .catch((error) => console.error('Error fetching bookings:', error));
+        }
+        
+        // Render the customer table
+        function renderTable() {
+            const tableBody = document.getElementById('customerTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+        
+            customerData.forEach((customer, index) => {
+                const row = document.createElement('tr');
+                row.dataset.index = index;
+                row.onclick = selectRow;
+                row.innerHTML = `
+                    <td>${customer.contact}</td>
+                    <td>${customer.checkin}</td>
+                    <td>${customer.checkout}</td>
+                    <td>${customer.roomType}</td>
+                    <td>${customer.availableRoom}</td>
+                    <td>${customer.meal}</td>
+                    <td>${customer.noOfDays}</td>
+                    <td>${customer.paidTax}</td>
+                    <td>${customer.subTotal}</td>
+                    <td>${customer.totalCost}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Select a row for update/delete
+        function selectRow(event) {
+            selectedRow = event.target.closest('tr');
+            const rowIndex = selectedRow.dataset.index;
+            populateForm(customerData[rowIndex]);
+        }
+        
+        // Populate the form with customer data
+        function populateForm(customer) {
+            Object.keys(customer).forEach((key) => {
+                const element = document.getElementById(key);
+                if (element) element.value = customer[key];
+            });
+        }
+        
+        // Update a booking
+        function updateBooking() {
+            if (!selectedRow) {
+                alert('Please select a row to update.');
+                return;
+            }
+        
+            const rowIndex = selectedRow.dataset.index;
+            const bookingId = customerData[rowIndex].id; // Assuming `id` exists in the data
+            const updatedFields = getFormValues();
+        
+            if (!updatedFields) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+        
+            fetch(`/api/bookings/${bookingId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedFields),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    alert(data.message);
+                    fetchBookings();
+                    resetForm();
+                })
+                .catch((error) => console.error('Error updating booking:', error));
+        }
+        
+        // Delete a booking
+        function deleteBooking() {
+            if (!selectedRow) {
+                alert('Please select a row to delete.');
+                return;
+            }
+        
+            const rowIndex = selectedRow.dataset.index;
+            const bookingId = customerData[rowIndex].id;
+        
+            fetch(`/api/bookings/${bookingId}`, { method: 'DELETE' })
+                .then((response) => response.json())
+                .then((data) => {
+                    alert(data.message);
+                    fetchBookings();
+                    resetForm();
+                })
+                .catch((error) => console.error('Error deleting booking:', error));
+        }
+        
+        // Fetch customer by contact
+        function addFetch() {
+            const contact = document.getElementById('contact').value;
+        
+            if (!contact) {
+                alert('Please enter a contact number.');
+                return;
+            }
+        
+            fetch(`/api/fetch_customer?contact=${contact}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+        
+                    const overlay = document.getElementById('overlayData');
+                    overlay.innerHTML = `
+                        <h3>Customer Details</h3>
+                        <p><strong>Name:</strong> ${data.name}</p>
+                        <p><strong>Phone:</strong> ${data.phone}</p>
+                        <p><strong>Email:</strong> ${data.email}</p>
+                        <p><strong>Address:</strong> ${data.address}</p>
+                    `;
+                    overlay.style.display = 'block';
+                })
+                .catch((error) => console.error('Error fetching customer:', error));
+        }
+        
+        // Reset the form
+        function resetForm() {
+            document.getElementById('bookingForm').reset();
+            selectedRow = null;
+        }
+        
+        // Calculate costs based on room type, meal, and days
+const roomPrices = { king: 50, luxury: 30, double: 20, normal: 10 };
+const mealPrices = { breakfast: 5, lunch: 7, dinner: 10, no: 0 };
+
+function calculateCosts() {
+    const roomTypeElement = document.getElementById('roomType');
+    const mealElement = document.getElementById('meal');
+    const noOfDaysElement = document.getElementById('noOfDays');
+
+    if (!roomTypeElement || !mealElement || !noOfDaysElement) {
+        console.error('Required input elements are missing from the DOM.');
+        return;
+    }
+
+    const roomType = roomTypeElement.value;
+    const meal = mealElement.value.toLowerCase();
+    const noOfDays = parseInt(noOfDaysElement.value) || 0;
+
+    if (!roomType || noOfDays <= 0) return;
+
+    const roomPrice = roomPrices[roomType] || 0;
+    const mealPrice = mealPrices[meal] || 0;
+
+    const subtotal = (roomPrice + mealPrice) * noOfDays;
+    const paidTax = subtotal * 0.15;
+    const totalCost = subtotal + paidTax;
+
+    document.getElementById('subTotal').value = subtotal.toFixed(2);
+    document.getElementById('paidTax').value = paidTax.toFixed(2);
+    document.getElementById('totalCost').value = totalCost.toFixed(2);
+}
+
+// Safely add event listeners for cost calculation
+['roomType', 'meal', 'noOfDays'].forEach((id) => {
+    const element = document.getElementById(id);
+    if (element) {
+        element.addEventListener('input', calculateCosts);
+    } else {
+        console.warn(`Element with id "${id}" is missing from the DOM.`);
+    }
+});
+
+        
+        // Helper to get form values
+        function getFormValues() {
+            const fields = [
+                'contact',
+                'checkin',
+                'checkout',
+                'roomType',
+                'availableRoom',
+                'meal',
+                'noOfDays',
+                'paidTax',
+                'subTotal',
+                'totalCost',
+            ];
+        
+            const values = {};
+            for (const field of fields) {
+                const element = document.getElementById(field);
+                if (!element || !element.value) return null; // Missing field
+                values[field] = element.value;
+            }
+            return values;
+        }
+        </script>
+        
+    
+    
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Management System Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/userhotel.css') }}">
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header">
+        <img src="{{ url_for('static', filename='image/hotel.jpg') }}" alt="Hotel Banner" class="header-image">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='image/logo.jpg') }}" alt="Hotel Logo">
+        </div>
+        <h1 class="title">Hotel Home Page</h1>
+    </div>
+
+    <!-- Main Content Section -->
+    <div class="content">
+        <div class="right-image">
+            <img src="{{ url_for('static', filename='image/R.jpg') }}" alt="Hotel Logo">
+            <div class="menu-overlay">
+                
+                <a href="{{ url_for('userroom') }}">
+                    <button class="menu-btn">Room</button>
+                </a>
+                
+                
+            </div>
+        </div>
+        <div id="dynamicContent">
+            <h2>Welcome to Our Hotel </h2>
+            <p>Click a menu item to access the service.</p>
+        </div>
+    </div>
+
+    <script>
+        
+    </script>
+    
+    
+</body>
+</html>

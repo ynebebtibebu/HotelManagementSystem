@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Management System Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/userroom2.css') }}">
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header">
+        <img src="{{ url_for('static', filename='image/hotel.jpg') }}" alt="Hotel Banner" class="header-image">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='image/logo.jpg') }}" alt="Hotel Logo">
+        </div>
+        <h1 class="title">Hotel Home Page</h1>
+    </div>
+
+    <!-- Main Content Section -->
+    <div class="content">
+        <div class="right-image">
+            
+            <div class="menu-overlay">
+                
+                    <a href="{{ url_for('description') }}">
+                        <img src="{{ url_for('static', filename='image/normal1.jpg') }}" alt="normal">
+                    </a>
+                    <a href="{{ url_for('doubledescription') }}">
+                        <img src="{{ url_for('static', filename='image/double1.jpg') }}" alt="double">
+                    </a>
+
+                    <a href="{{ url_for('lexurydescription') }}">
+                        <img src="{{ url_for('static', filename='image/lexury1.jpg') }}" alt="lexury">
+                        
+                    </a>
+                    <a href="{{ url_for('kingdescription') }}">
+                        <img src="{{ url_for('static', filename='image/king4.jpg') }}" alt="king">
+                    </a>
+    
+            </div>
+            <div class="menu">
+                
+                <a href="{{ url_for('room') }}">
+                    <button class="menu-btn">Book Now</button>
+                </a>   
+            </div>
+        </div>
+        <div id="dynamicContent" class="dynamic-content">
+            <h2>Welcome to Our Hotel</h2>
+            <p>Click a book now button to access the service.</p>  
+        </div>
+        <!-- <footer>
+            <p>&copy; 2024 Your Website | All Rights Reserved</p>
+        </footer> -->
+    </div>
+    
+    
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Management System Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hotel.css') }}">
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header">
+        <img src="{{ url_for('static', filename='image/hotel.jpg') }}" alt="Hotel Banner" class="header-image">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='image/logo.jpg') }}" alt="Hotel Logo">
+        </div>
+        <h1 class="title">Hotel Home Page</h1>
+    </div>
+
+    <!-- Main Content Section -->
+    <div class="content">
+        <div class="right-image">
+            <img src="{{ url_for('static', filename='image/R.jpg') }}" alt="Hotel Logo">
+            <div class="menu-overlay">
+                <a href="{{ url_for('customer') }}">
+                    <button class="menu-btn">Manage Customer</button>
+                </a>
+                <a href="{{ url_for('room') }}">
+                    <button class="menu-btn">Manage Room</button>
+                </a>
+                <a href="{{ url_for('details') }}">
+                    <button class="menu-btn">Details</button>
+                </a>
+                <a href="{{ url_for('room2') }}">
+                    <button class="menu-btn">Book Now</button>
+                </a>
+                <a href="#" onclick="logout()">
+                    <button class="menu-btn">Logout</button>
+                </a>
+                
+                
+            </div>
+        </div>
+        <div id="dynamicContent">
+            <h2>Welcome to the Hotel Management System</h2>
+            <p>Click a menu item to manage the hotel.</p>
+        </div>
+    </div>
+
+    <script>
+        // Logout functionality
+        function logout() {
+            const confirmation = confirm('Are you sure you want to log out?');
+            if (confirmation) {
+                // Clear any session or local storage data
+                sessionStorage.clear();
+                localStorage.clear();
+    
+                // Notify the server (POST request to /logout)
+                fetch('{{ url_for("logout") }}', {
+                    method: 'POST',  // Ensure POST request
+                    headers: {
+                        'Content-Type': 'application/json',  // Optional: For JSON requests
+                    },
+                }).then(response => {
+                    if (response.ok) {
+                        // Redirect to login page after successful logout
+                        window.location.href = '{{ url_for("login") }}';
+                    } else {
+                        alert('Logout failed. Please try again.');
+                    }
+                }).catch(error => {
+                    console.error('Logout error:', error);
+                });
+            }
+        }
+    </script>
+    
+    
+</body>
+</html>

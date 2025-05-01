@@ -1,0 +1,168 @@
+/* Reset default margins and paddings */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    overflow-x: hidden;
+}
+
+/* Header styling */
+.header {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header-image {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    transition: transform 0.5s ease-in-out;
+}
+
+.header-image:hover {
+    transform: scale(1.05);
+}
+
+.logo {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #000;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* Positioning the menu over the header image */
+.menu-overlay {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two equal columns */
+    gap: 20px; /* Spacing between images */
+    justify-items: center; /* Center the images horizontally within the grid */
+    margin-top: 30px; /* Add some space above the grid */
+    margin-bottom: 30px; /* Add some space below the grid */
+    padding: 0 20px; /* Padding for responsiveness */
+}
+
+.menu-overlay a {
+    text-decoration: none;
+    position: relative;
+    width: 100%;
+    max-width: 300px; /* Maximum width of each image */
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.menu-overlay a img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.menu-overlay a:hover {
+    transform: scale(1.05); /* Slight zoom effect on hover */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Dynamic content area */
+#dynamicContent {
+    text-align: center;
+    animation: fadeIn 0.5s ease-out;
+}
+
+#dynamicContent h2 {
+    margin-bottom: 20px;
+}
+.menu{
+    position: fixed;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 10;
+}
+
+/* Remove text-decoration from links around buttons */
+.menu a {
+    text-decoration: none;  /* Remove underline from anchor tags */
+}
+
+/* Menu button styling */
+.menu-btn {
+    width: 200px; /* Ensures uniform width */
+    height: 50px; /* Set a fixed height for all buttons */
+    padding: 0; /* Remove padding to avoid any height mismatch */
+    font-size: 18px;
+    color: black;
+    background-color: gold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex; /* Use flexbox to center text vertically */
+    justify-content: center; /* Center the text horizontally */
+    align-items: center; /* Center the text vertically */
+    transition: background-color 0.3s, transform 0.3s;
+    text-decoration: none; /* Ensure no underline on button text */
+}
+
+/* Hover and focus states */
+.menu-btn:hover {
+    background-color: black;
+    color: gold;
+    transform: scale(1.1);
+}
+
+.menu-btn:focus,
+.menu-btn:hover {
+    text-decoration: none; /* Ensure no underline on hover or focus */
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    /* Make the grid a single column on smaller screens */
+    .menu-overlay {
+        grid-template-columns: 1fr;
+        gap: 15px; /* Reduce the gap on smaller screens */
+    }
+
+    /* Adjust image sizes for mobile */
+    .menu-overlay a {
+        max-width: 100%; /* Full width for mobile */
+        width: 100%;
+    }
+
+    .header-image {
+        height: 120px; /* Slightly smaller header image on mobile */
+    }
+}

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/customer.css') }}">
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='image/logo.jpg') }}" alt="logo">
+        </div>
+        <h1>Customer Management</h1>
+    </header>
+
+    <div class="container">
+        <!-- Form Container -->
+        <div class="form-container">
+            <h2>Customer Details</h2>
+            <form id="customerForm">
+                <label for="customerRef">Customer Ref:</label>
+                <input type="text" id="customerRef" name="customerRef" placeholder="This inpu is not accept  " readonly>
+
+                <label for="customerName">Customer Name:</label>
+                <input type="text" id="customerName" name="customerName" required>
+
+                <label for="phone">Phone Number:</label>
+                <input type="text" id="phone" name="phone" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email">
+
+                <label for="address">Address:</label>
+                <input type="text" id="address" name="address">
+
+                <label for="id">ID Number:</label>
+                <input type="text" id="id" name="id">
+
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender">
+                    <option value="">Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+
+                <label for="nationality">Nationality:</label>
+                <select id="nationality" name="nationality">
+                    <option value="">Select</option>
+                    <option value="USA">USA</option>
+                    <option value="India">India</option>
+                    <option value="UK">UK</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Australia">Australia</option>
+                </select>
+
+                <div class="btn-group">
+                    <button type="button" class="btn" onclick="addCustomer()">Add</button>
+                    <button type="button" class="btn" onclick="updateCustomer()">Update</button>
+                    <button type="button" class="btn" onclick="deleteCustomer()">Delete</button>
+                    <button type="button" class="btn" onclick="resetForm()">Reset</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <h2>View Details</h2>
+            <div>
+                <label for="search">Search By:</label>
+                <select id="searchBy">
+                    <option value="ref">Customer Ref</option>
+                    <option value="phone">Phone</option>
+                </select>
+                <input type="text" id="search" placeholder="Enter search term">
+                <button class="btn" onclick="searchCustomer()">Search</button>
+                <button class="btn" onclick="showAllCustomers()">Show All</button>
+            </div>
+            
+
+            <div class="scrollable-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer Ref</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Address</th>
+                            <th>ID</th>
+                            <th>Gender</th>
+                            <th>Nationality</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerTable">
+                        <!-- Dynamic Rows Go Here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let customers = [];
+        let selectedRow = null;
+
+        // Fetch all customers on page load
+        document.addEventListener("DOMContentLoaded", showAllCustomers);
+
+        function addCustomer() {
+            const customer = {
+                customerName: document.getElementById('customerName').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value,
+                id: document.getElementById('id').value,
+                gender: document.getElementById('gender').value,
+                nationality: document.getElementById('nationality').value
+            };
+
+            fetch('http://127.0.0.1:5000/customers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(customer)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                showAllCustomers();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function updateCustomer() {
+            if (!selectedRow) {
+                alert('Select a customer to update.');
+                return;
+            }
+
+            const customer = {
+                customerRef: document.getElementById('customerRef').value,
+                customerName: document.getElementById('customerName').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value,
+                id: document.getElementById('id').value,
+                gender: document.getElementById('gender').value,
+                nationality: document.getElementById('nationality').value
+            };
+
+            fetch('http://127.0.0.1:5000/customers', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(customer)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                showAllCustomers();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function deleteCustomer() {
+            if (!selectedRow) {
+                alert('Select a customer to delete.');
+                return;
+            }
+
+            const customerRef = document.getElementById('customerRef').value;
+
+            fetch(`http://127.0.0.1:5000/customers?customerRef=${customerRef}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                showAllCustomers();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function resetForm() {
+            document.getElementById('customerForm').reset();
+            document.getElementById('customerRef').value = '';
+            selectedRow = null;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('customerTable');
+            tbody.innerHTML = '';
+
+            customers.forEach((customer, index) => {
+                const row = document.createElement('tr');
+                row.dataset.index = index;
+                row.innerHTML = `
+                    <td>${customer.customerRef}</td>
+                    <td>${customer.customerName}</td>
+                    <td>${customer.phone}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.address}</td>
+                    <td>${customer.id}</td>
+                    <td>${customer.gender}</td>
+                    <td>${customer.nationality}</td>
+                `;
+
+                row.onclick = () => {
+                    selectedRow = row;
+                    document.getElementById('customerRef').value = customer.customerRef;
+                    document.getElementById('customerName').value = customer.customerName;
+                    document.getElementById('phone').value = customer.phone;
+                    document.getElementById('email').value = customer.email;
+                    document.getElementById('address').value = customer.address;
+                    document.getElementById('id').value = customer.id;
+                    document.getElementById('gender').value = customer.gender;
+                    document.getElementById('nationality').value = customer.nationality;
+                };
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function searchCustomer() {
+            const searchBy = document.getElementById('searchBy').value;  // 'ref' or 'phone'
+            const searchValue = document.getElementById('search').value.trim().toLowerCase();  // Search term
+
+            if (!searchValue) {
+                alert('Please enter a search term.');
+                return;
+            }
+
+            // Build the URL to send the GET request to
+            const url = `http://127.0.0.1:5000/customers/search?searchBy=${searchBy}&searchValue=${searchValue}`;
+
+            // Fetch customer data
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message && data.message === 'No customers found') {
+                        alert('No customers found');
+                        return;
+                    }
+                    customers = data;  // Update the customers array with the search result
+                    renderTable();  // Re-render the table with the filtered customers
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error searching for customers.');
+                });
+        }
+
+
+        function showAllCustomers() {
+            fetch('http://127.0.0.1:5000/customers')
+                .then(response => response.json())
+                .then(data => {
+                    customers = data;
+                    renderTable();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+
+</html>

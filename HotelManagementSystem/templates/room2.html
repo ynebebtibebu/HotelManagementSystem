@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/room.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Room Booking Form</h2>
+        <form action="/api/bookings" method="POST">
+            <!-- Room Type Dropdown -->
+            <div class="form-group">
+                <label for="roomType">Room Type:</label>
+                <select id="roomType" name="roomType" required>
+                    {% for room_type in room_types %}
+                        <option value="{{ room_type }}">{{ room_type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Available Room Dropdown -->
+            <div class="form-group">
+                <label for="availableRoom">Available Room:</label>
+                <select id="availableRoom" name="availableRoom" required>
+                    {% for room_no in available_rooms %}
+                        <option value="{{ room_no }}">{{ room_no }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

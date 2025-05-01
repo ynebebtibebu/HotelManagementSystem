@@ -1,0 +1,200 @@
+/* Reset default margins and paddings */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    overflow-x: hidden;
+}
+
+/* Header styling */
+.header {
+    position: relative;
+    width: 100%;
+    text-align: center;
+}
+
+.header-image {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+}
+
+header .header-image {
+    width: 100%;
+    height: 100px; /* Adjusted height */
+    object-fit: cover;
+    transition: transform 0.5s ease-in-out;
+}
+
+header .header-image:hover {
+    transform: scale(1.05);
+}
+
+.logo {
+    position: absolute;
+    top: 25px;
+    left: 10px;
+    width: 100px;
+    height: 90px;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid #000;
+}
+
+/* Positioning the menu over the header image */
+.menu-overlay {
+    position: fixed;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 10;
+}
+
+/* Remove text-decoration from links around buttons */
+.menu-overlay a {
+    text-decoration: none;  /* Remove underline from anchor tags */
+}
+
+/* Menu button styling */
+.menu-btn {
+    width: 200px; /* Ensures uniform width */
+    height: 50px; /* Set a fixed height for all buttons */
+    padding: 0; /* Remove padding to avoid any height mismatch */
+    font-size: 18px;
+    color: black;
+    background-color: gold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex; /* Use flexbox to center text vertically */
+    justify-content: center; /* Center the text horizontally */
+    align-items: center; /* Center the text vertically */
+    transition: background-color 0.3s, transform 0.3s;
+    text-decoration: none; /* Ensure no underline on button text */
+}
+
+/* Hover and focus states */
+.menu-btn:hover {
+    background-color: black;
+    color: gold;
+    transform: scale(1.1);
+}
+
+.menu-btn:focus,
+.menu-btn:hover {
+    text-decoration: none; /* Ensure no underline on hover or focus */
+}
+
+/* Main content container */
+.main-container {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* Menu section */
+.menu {
+    width: 250px;
+    background-color: black;
+    color: gold;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.menu h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* Content area */
+.content {
+    flex-grow: 1;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    min-width: 600px;
+}
+
+.right-image, .food-image {
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 15px;
+}
+
+.right-image img, .food-image img {
+    width: 100%;
+    max-width: 1100px;
+    height: auto;
+    border-radius: 8px;
+    transition: transform 0.5s ease-in-out;
+}
+
+.right-image img:hover, .food-image img:hover {
+    transform: scale(1.1);
+}
+
+/* Dynamic content area */
+#dynamicContent {
+    
+    text-align: center;
+    animation: fadeIn 0.5s ease-out;
+}
+
+#dynamicContent h2 {
+    
+    margin-bottom: 20px;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .menu {
+        width: 100%;
+        max-width: 250px;
+        margin-bottom: 20px;
+    }
+
+    .content {
+        width: 100%;
+        max-width: 1200px;
+    }
+
+    /* Adjust button size on mobile */
+    .menu-btn {
+        font-size: 16px;
+        padding: 12px 25px;
+        width: 100%; /* Make buttons take up full width on smaller screens */
+        height: auto; /* Let height adjust for smaller screens */
+    }
+}

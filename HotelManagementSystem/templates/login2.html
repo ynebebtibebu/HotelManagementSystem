@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header">
+        <img src="{{ url_for('static', filename='image/hotel.jpg') }}" alt="Hotel Banner" class="header-image">
+
+        <div class="logo">
+            <img src="{{ url_for('static', filename='image/logo.jpg') }}" alt="Hotel Logo">
+        </div>
+
+        <h1 class="title">Hotel Login Page</h1>
+        <!-- Login Form Section -->
+    <div class="login-container">
+        <div class="login-box">
+            <h2>Login Page</h2>
+            <!-- Form for login submission -->
+            <form action="{{ url_for('login') }}" id="loginForm" method="POST" autocomplete="off">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username" autocomplete="off">
+            
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="new-password">
+            
+                <button type="submit" class="btn">Login</button>
+            </form>
+
+            <!-- Display Flash Messages (error or success) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul>
+                        {% for category, message in messages %}
+                            <li class="flash {{ category }}" style="color: red; margin-top: 10px;">
+                                <p>{{ message }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+    </div>
+
+    
+
+    <script>
+        // Client-side form validation (optional, as HTML5 validation handles this too)
+        document.getElementById("loginForm").onsubmit = function(event) {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            // Check if fields are empty (additional custom validation)
+            if (!username || !password) {
+                alert("Please enter both username and password.");
+                event.preventDefault();  // Prevent form submission if fields are empty
+            }
+        };
+    </script>
+</body>
+</html>

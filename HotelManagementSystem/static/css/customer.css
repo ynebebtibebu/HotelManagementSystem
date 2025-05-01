@@ -1,0 +1,161 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+}
+
+header {
+    background-color: black;
+    color: gold;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.logo {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 100px;
+    height: 90px;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid #000;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 20px;
+}
+
+
+.form-container,
+.table-container {
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 20px;
+    border-radius: 5px;
+    flex: 1;
+    min-width: 400px;
+}
+
+/* Updated form-container for responsive height */
+.form-container {
+    flex: 0 0 30%;
+    max-width: 100%;
+    height: 70vh;   /* Adjusts the form height to 70% of viewport height */
+    overflow-y: auto; /* Adds scrolling if content exceeds height */
+    min-height: 100px; /* Ensures minimum height */
+}
+
+/* Form Inputs and Selects */
+.form-container label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+.form-container input,
+.form-container select {
+    width: 90%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Adjust button container to have space between buttons */
+.form-container .btn-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;  /* Ensure some space between buttons */
+}
+
+/* Buttons */
+.btn {
+    padding: 10px 15px;
+    border: none;
+    background-color: black;
+    color: gold;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+
+.btn:hover {
+    background-color: gold;
+    color: black;
+}
+
+/* Table container */
+.table-container {
+    flex: 1; /* Allow the table-container to take up remaining space */
+    position: relative;
+}
+.table-container thead {
+    position: sticky;  /* Stick the header at the top of the table */
+    top: 0;  /* Keeps the header at the top */
+    background-color: black;  /* Ensures background color */
+    z-index: 10;  /* Places the header above other rows */
+    color: white;  /* Ensures text is visible on dark background */
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.table-container table th,
+.table-container table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.table-container table th {
+    background-color: black;
+    color: white;
+}
+
+/* Scrollable Table Section */
+.scrollable-table {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+}
+
+/* Responsive Design for Smaller Screens */
+@media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .form-container {
+        max-width: 100%;
+        min-height: auto;
+        flex: 0 0 100%; /* Ensure it takes full width on smaller screens */
+        height: auto;  /* Allow it to shrink */
+        overflow-y: auto; /* Scrollable if content exceeds height */
+    }
+
+    .table-container {
+        max-width: 100%;
+        flex: 0 0 100%; /* Ensure it takes full width on smaller screens */
+        min-height: auto;
+        height: auto;
+    }
+
+    .btn-group {
+        gap: 5px; /* Decreases space between buttons for smaller screens */
+    }
+}
